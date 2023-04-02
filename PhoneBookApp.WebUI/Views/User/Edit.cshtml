@@ -1,0 +1,46 @@
+﻿@model UserEditDto
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-12">
+            <div class="bg-light rounded h-100 p-4">
+                <h6 class="mb-4 text-center">@Model.FirstName @Model.LastName Kişi Bilgileri</h6>
+                <form method="post" asp-action="Edit" asp-controller="User">
+                    <input type="hidden" asp-for="UserId" />
+                    <div class="row mb-3">
+                        <label for="inputEmail3" class="col-sm-2 col-form-label">Adı</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" asp-for="FirstName" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-sm-2 col-form-label">Soyadı</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" asp-for="LastName" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-sm-2 col-form-label">Şirket</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" asp-for="Company" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-sm-2 col-form-label">İletişim</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" asp-for="ContactType" />
+                        </div>
+                    </div>
+                    <div style="text-align:center">
+                        <button type="submit" class="btn btn-success">Güncelle</button>
+                        <a href="/User/Index" class="btn btn-primary">Geri Dön</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

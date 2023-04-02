@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Kişi Ekle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-12">
+            <div class="bg-light rounded h-100 p-4">
+                <h6 class="mb-4 text-center">Rehbere Kişi Ekle</h6>
+                <form method="post" asp-action="Add" asp-controller="User">
+                    <div class="row mb-3">
+                        <label for="inputEmail3" class="col-sm-2 col-form-label">Adı</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="FirstName" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-sm-2 col-form-label">Soyadı</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="LastName" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-sm-2 col-form-label">Şirket</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="Company" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-sm-2 col-form-label">İletişim Bilgisi</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="ContactType" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-sm-2 col-form-label">İletişim İçeriği</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="ContactContent" />
+                        </div>
+                    </div>
+                    <div style="text-align:center">
+                        <button type="submit" class="btn btn-success">Ekle</button>
+                        <a href="/User/Index" class="btn btn-primary">Geri Dön</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
