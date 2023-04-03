@@ -1,9 +1,11 @@
 using Autofac;
+using Newtonsoft.Json;
 using Autofac.Extensions.DependencyInjection;
 using PhoneBookApp.Business.DependencyResolvers.Autofac;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(option =>

@@ -1,16 +1,17 @@
-﻿using PhoneBookApp.Entities.Dtos;
-using PhoneBookApp.Entities.Concrete;
+﻿using PhoneBookApp.Entities.Concrete;
 
 namespace PhoneBookApp.Business.Abstract
 {
     public interface IUserService
     {
-        void Add(UserAddDto userAddDto);
-        void Delete(User user);
-        void Update(UserEditDto userEditDto);
+        void Add(User user);
+        void Update(User user);
+        void Delete(Guid id);
+        void ChangeStatus(Guid id);
         User GetById(Guid id);
-        UserListDto GetByUser(Guid userId);
+        User GetByUser(Guid userId);
         List<User> GetList();
-        List<UserListDto> GetUserList();
+        List<User> GetUserList();
+        List<User> GetDeletedUserList();
     }
 }

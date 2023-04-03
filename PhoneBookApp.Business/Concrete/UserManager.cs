@@ -1,5 +1,4 @@
-﻿using PhoneBookApp.Entities.Dtos;
-using PhoneBookApp.Business.Abstract;
+﻿using PhoneBookApp.Business.Abstract;
 using PhoneBookApp.Entities.Concrete;
 using PhoneBookApp.DataAccess.Abstract;
 
@@ -14,35 +13,69 @@ namespace PhoneBookApp.Business.Concrete
         {
             _userDal = userDal;
             _contactService = contactService;
-
         }
 
-        public void Add(UserAddDto userAddDto)
+        public void Add(User user)
         {
-            User user = new()
+            user.IsActive = true;
+            _userDal.Add(user);
+            var getUser = GetByUser(user.Id);
+            Contact contact = new()
             {
-                FirstName = userAddDto.FirstName,
-                LastName = userAddDto.LastName,
-                Company = userAddDto.Company,
+                Content = user.Contacts[0].Content,
+                Type = user.Contacts[0].Type,
+                UserId = getUser.Id,
+                User = getUser,
                 IsActive = true
             };
-            _userDal.Add(user);
-            if (userAddDto.ContactType != null)
-            {
-                Contact contact = new()
-                {
-                    UserId = _userDal.GetList().TakeLast(1).Select(p => p.Id).FirstOrDefault(),
-                    Content = userAddDto.ContactContent,
-                    Type = userAddDto.ContactType,
-                    IsActive = true
-                };
-                _contactService.Add(contact);
-            }
+            _contactService.Add(contact);
         }
 
-        public void Delete(User user)
+        public void ChangeStatus(Guid id)
         {
-            _userDal.Delete(user);
+            var user = GetByUser(id);
+            if (user.IsActive == true)
+            {
+                user.IsActive = false;
+            }
+            else
+            {
+                user.IsActive = true;
+            }
+            _userDal.Update(user);
+            var userContact = user.Contacts[0];
+            if (userContact.IsActive == true)
+            {
+                userContact.IsActive = false;
+            }
+            else
+            {
+                userContact.IsActive = true;
+            }
+            _contactService.Update(userContact);
+        }
+
+        public void Delete(Guid id)
+        {
+            var user = GetByUser(id);
+            if (user.Contacts[0].IsActive == false)
+            {
+                _contactService.Delete(user.Contacts[0]);
+            }
+            else
+            {
+                user.Contacts[0].IsActive = false;
+                _contactService.Update(user.Contacts[0]);
+            }
+            if (user.IsActive == false)
+            {
+                _userDal.Delete(user);
+            }
+            else
+            {
+                user.IsActive = false;
+                _userDal.Update(user);
+            }
         }
 
         public User GetById(Guid id)
@@ -50,9 +83,14 @@ namespace PhoneBookApp.Business.Concrete
             return _userDal.Get(p => p.Id == id);
         }
 
-        public UserListDto GetByUser(Guid userId)
+        public User GetByUser(Guid userId)
         {
             return _userDal.GetByUser(userId);
+        }
+
+        public List<User> GetDeletedUserList()
+        {
+            return _userDal.GetUserList().Where(p => p.IsActive == false).OrderBy(p => p.FirstName).ToList();
         }
 
         public List<User> GetList()
@@ -60,34 +98,15 @@ namespace PhoneBookApp.Business.Concrete
             return _userDal.GetList(p => p.IsActive == true);
         }
 
-        public List<UserListDto> GetUserList()
+        public List<User> GetUserList()
         {
-            return _userDal.GetUserList();
+            return _userDal.GetUserList().Where(p => p.IsActive == true).OrderBy(p => p.FirstName).ToList();
         }
 
-        public void Update(UserEditDto userEditDto)
+        public void Update(User user)
         {
-            User user = new()
-            {
-                Id = userEditDto.UserId,
-                FirstName = userEditDto.FirstName,
-                LastName = userEditDto.LastName,
-                Company = userEditDto.Company,
-                IsActive = true
-            };
             _userDal.Update(user);
-            if (userEditDto.ContactType != null)
-            {
-                Contact contact = new()
-                {
-                    UserId = userEditDto.UserId,
-                    Content = userEditDto.ContactContent,
-                    Type = userEditDto.ContactType,
-                    IsActive = true
-                };
-                _contactService.Update(contact);
-            }
-            _userDal.Update(user);
+            _contactService.Update(user.Contacts[0]);
         }
     }
 }

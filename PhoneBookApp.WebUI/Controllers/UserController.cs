@@ -1,7 +1,9 @@
 ﻿using System.Text;
 using Newtonsoft.Json;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
-using PhoneBookApp.Entities.Dtos;
+using PhoneBookApp.Entities.Concrete;
+using PhoneBookApp.Business.ValidationRules.FluentValidation;
 
 namespace PhoneBookApp.WebUI.Controllers
 {
@@ -21,7 +23,7 @@ namespace PhoneBookApp.WebUI.Controllers
             if (responseMessage.IsSuccessStatusCode)
             {
                 var jsonData = await responseMessage.Content.ReadAsStringAsync();
-                var values = JsonConvert.DeserializeObject<List<UserListDto>>(jsonData);
+                var values = JsonConvert.DeserializeObject<List<User>>(jsonData);
                 return View(values);
             }
             return View();
@@ -34,7 +36,7 @@ namespace PhoneBookApp.WebUI.Controllers
             if (responseMessage.IsSuccessStatusCode)
             {
                 var jsonData = await responseMessage.Content.ReadAsStringAsync();
-                var values = JsonConvert.DeserializeObject<UserListDto>(jsonData);
+                var values = JsonConvert.DeserializeObject<User>(jsonData);
                 return View(values);
             }
             return View();
@@ -47,15 +49,27 @@ namespace PhoneBookApp.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(UserAddDto userAddDto)
+        public async Task<IActionResult> Add(User user)
         {
-            var client = _httpClientFactory.CreateClient();
-            var jsonData = JsonConvert.SerializeObject(userAddDto);
-            StringContent content = new(jsonData, Encoding.UTF8, "application/json");
-            var responseMessage = await client.PostAsync("http://localhost:5119/api/Users/Add", content);
-            if (responseMessage.IsSuccessStatusCode)
+            UserValidator userValidator = new();
+            ValidationResult validationResult = userValidator.Validate(user);
+            if (validationResult.IsValid)
             {
-                return RedirectToAction("Index", "User");
+                var client = _httpClientFactory.CreateClient();
+                var jsonData = JsonConvert.SerializeObject(user);
+                StringContent content = new(jsonData, Encoding.UTF8, "application/json");
+                var responseMessage = await client.PostAsync("http://localhost:5119/api/Users/Add", content);
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index", "User");
+                }
+            }
+            else
+            {
+                foreach (var item in validationResult.Errors)
+                {
+                    ModelState.AddModelError(item.PropertyName, item.ErrorMessage);
+                }
             }
             return View();
         }
@@ -68,35 +82,75 @@ namespace PhoneBookApp.WebUI.Controllers
             if (responseMessage.IsSuccessStatusCode)
             {
                 var jsonData = await responseMessage.Content.ReadAsStringAsync();
-                var values = JsonConvert.DeserializeObject<UserEditDto>(jsonData);
+                var values = JsonConvert.DeserializeObject<User>(jsonData);
                 return View(values);
             }
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UserEditDto userEditDto)
+        public async Task<IActionResult> Edit(User user)
         {
-            var client = _httpClientFactory.CreateClient();
-            var jsonData = JsonConvert.SerializeObject(userEditDto);
-            StringContent content = new(jsonData, Encoding.UTF8, "application/json");
-            var responseMessage = await client.PutAsync("http://localhost:5119/api/Users/Update", content);
-            if (responseMessage.IsSuccessStatusCode)
+            UserValidator userValidator = new();
+            ValidationResult validationResult = userValidator.Validate(user);
+            if (validationResult.IsValid)
             {
-                return RedirectToAction("Index", "User");
+                var client = _httpClientFactory.CreateClient();
+                var jsonData = JsonConvert.SerializeObject(user);
+                StringContent content = new(jsonData, Encoding.UTF8, "application/json");
+                var responseMessage = await client.PutAsync("http://localhost:5119/api/Users/Update", content);
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index", "User");
+                }
+            }
+            else
+            {
+                foreach (var item in validationResult.Errors)
+                {
+                    ModelState.AddModelError(item.PropertyName, item.ErrorMessage);
+                }
             }
             return View();
         }
 
-        [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {
             var client = _httpClientFactory.CreateClient();
-            var user = await client.GetAsync($"http://localhost:5119/api/Users/GetByUser/{id}");
-            var responseMessage = await client.DeleteAsync($"http://localhost:5119/api/users/delete/{user}");
+            var responseMessage = await client.DeleteAsync($"http://localhost:5119/api/Users/Delete/{id}");
             if (responseMessage.IsSuccessStatusCode)
             {
-                return RedirectToAction("Index", "User");
+                return RedirectToAction("Deleted", "User");
+            }
+            return View();
+        }
+
+        public async Task<IActionResult> ChangeStatus(Guid id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var user = await client.GetAsync($"http://localhost:5119/api/Users/GetByUser/{id}");
+            if (user.IsSuccessStatusCode)
+            {
+                var jsonData = JsonConvert.SerializeObject(user);
+                StringContent content = new(jsonData, Encoding.UTF8, "application/json");
+                var responseMessage = await client.PutAsync($"http://localhost:5119/api/Users/ChangeStatus/{id}", content);
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index", "User");
+                }
+            }
+            return View();
+        }
+
+        public async Task<IActionResult> Deleted()
+        {
+            var client = _httpClientFactory.CreateClient();
+            var responseMessage = await client.GetAsync("http://localhost:5119/api/Users/GetDeletedUserList");
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                var jsonData = await responseMessage.Content.ReadAsStringAsync();
+                var values = JsonConvert.DeserializeObject<List<User>>(jsonData);
+                return View(values);
             }
             return View();
         }

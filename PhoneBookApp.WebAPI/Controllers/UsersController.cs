@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Cors;
 using PhoneBookApp.Business.Abstract;
 using PhoneBookApp.Entities.Concrete;
-using PhoneBookApp.Entities.Dtos;
 
 namespace PhoneBookApp.WebAPI.Controllers
 {
@@ -19,23 +18,23 @@ namespace PhoneBookApp.WebAPI.Controllers
         }
 
         [HttpPost("Add")]
-        public IActionResult Add(UserAddDto userAddDto)
+        public IActionResult Add(User user)
         {
-            _userService.Add(userAddDto);
+            _userService.Add(user);
             return Ok("Kişi eklendi");
         }
 
-        [HttpDelete("Delete")]
-        public IActionResult Delete(User user)
+        [HttpDelete("Delete/{id}")]
+        public IActionResult Delete(Guid id)
         {
-            _userService.Delete(user);
+            _userService.Delete(id);
             return Ok("Kişi silindi");
         }
 
         [HttpPut("Update")]
-        public IActionResult Update(UserEditDto userEditDto)
+        public IActionResult Update(User user)
         {
-            _userService.Update(userEditDto);
+            _userService.Update(user);
             return Ok("Kişi güncellendi");
         }
 
@@ -48,6 +47,13 @@ namespace PhoneBookApp.WebAPI.Controllers
                 return Ok(result);
             }
             return BadRequest();
+        }
+
+        [HttpPut("ChangeStatus/{id}")]
+        public IActionResult ChangeStatus(Guid id)
+        {
+            _userService.ChangeStatus(id);
+            return Ok("Durum değiştirildi");
         }
 
         [HttpGet("GetList")]
@@ -65,6 +71,17 @@ namespace PhoneBookApp.WebAPI.Controllers
         public IActionResult GetUserList()
         {
             var result = _userService.GetUserList();
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest();
+        }
+
+        [HttpGet("GetDeletedUserList")]
+        public IActionResult GetDeletedUserList()
+        {
+            var result = _userService.GetDeletedUserList();
             if (result != null)
             {
                 return Ok(result);
