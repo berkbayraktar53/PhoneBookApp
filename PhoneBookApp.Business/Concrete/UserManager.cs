@@ -78,6 +78,11 @@ namespace PhoneBookApp.Business.Concrete
             }
         }
 
+        public List<User> Get5LastAddedUsers()
+        {
+            return _userDal.GetUserList().TakeLast(5).ToList();
+        }
+
         public User GetById(Guid id)
         {
             return _userDal.Get(p => p.Id == id);

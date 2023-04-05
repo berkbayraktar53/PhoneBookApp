@@ -78,6 +78,17 @@ namespace PhoneBookApp.WebAPI.Controllers
             return BadRequest();
         }
 
+        [HttpGet("Get5LastAddedUsers")]
+        public IActionResult Get5LastAddedUsers()
+        {
+            var result = _userService.Get5LastAddedUsers();
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest();
+        }
+
         [HttpGet("GetDeletedUserList")]
         public IActionResult GetDeletedUserList()
         {

@@ -13,6 +13,7 @@ namespace PhoneBookApp.Business.Abstract
         List<User> GetList();
         List<User> GetUserList();
         List<User> GetDeletedUserList();
+        List<User> Get5LastAddedUsers();
         IQueryable GetRegisteredUserCount();
         IQueryable GetRegisteredPhoneCount();
         IQueryable GetRegisteredLocationCount();
