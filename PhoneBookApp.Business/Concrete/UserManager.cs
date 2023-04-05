@@ -98,6 +98,21 @@ namespace PhoneBookApp.Business.Concrete
             return _userDal.GetList(p => p.IsActive == true);
         }
 
+        public IQueryable GetRegisteredLocationCount()
+        {
+            return _userDal.GetRegisteredLocationCount();
+        }
+
+        public IQueryable GetRegisteredPhoneCount()
+        {
+            return _userDal.GetRegisteredPhoneCount();
+        }
+
+        public IQueryable GetRegisteredUserCount()
+        {
+            return _userDal.GetRegisteredUserCount();
+        }
+
         public List<User> GetUserList()
         {
             return _userDal.GetUserList().Where(p => p.IsActive == true).OrderBy(p => p.FirstName).ToList();

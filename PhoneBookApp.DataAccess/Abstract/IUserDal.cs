@@ -6,5 +6,8 @@ namespace PhoneBookApp.DataAccess.Abstract
     {
         User GetByUser(Guid userId);
         List<User> GetUserList();
+        IQueryable GetRegisteredUserCount();
+        IQueryable GetRegisteredPhoneCount();
+        IQueryable GetRegisteredLocationCount();
     }
 }
